@@ -23,7 +23,7 @@ namespace ABCBankWebApi.Services
             Account accounts = null;
             do
             {
-                account.AccountNumber = account.BankBranch.BranchCode.ToString() + account.AccountType.AccountTypeId + new Random().Next(100000, 1000000);
+                account.AccountNumber = account.BankBranch.BranchCode.ToString() + account.AccountType.AccountTypeId + new Random().Next(1000000, 10000000);
                 accounts = StoredProcedure.ExecuteStoredProcedureWithResult<Account>("Sp_CheckAccountNumber", new List<SqlParameter> { new SqlParameter("@AccountNumber", account.AccountNumber) }).FirstOrDefault();
             } while (accounts != null);
             List<SqlParameter> sqlParameters = new List<SqlParameter>();
