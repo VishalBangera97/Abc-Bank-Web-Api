@@ -23,18 +23,25 @@ namespace AbcBankDalLayer.Controllers
         [HttpPut("SetClientId/{token}")]
         public IActionResult SetClientId(string token)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-            var stringClientId = jsonToken.Claims.First().Value;
-            var longClientId = Int64.Parse(stringClientId);
-            if (clientService.GetClientByClientId(longClientId) != null)
+            try
             {
-                HttpContext.Session.Set("clientId", BitConverter.GetBytes(longClientId));
-                return Ok();
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+                var stringClientId = jsonToken.Claims.First().Value;
+                var longClientId = Int64.Parse(stringClientId);
+                if (clientService.GetClientByClientId(longClientId) != null)
+                {
+                    HttpContext.Session.Set("clientId", BitConverter.GetBytes(longClientId));
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(404);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(404);
+                return StatusCode(401, ex.Message);
             }
         }
 
