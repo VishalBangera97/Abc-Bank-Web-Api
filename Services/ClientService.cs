@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace ABCBankWebApi.Services
 {
@@ -80,8 +81,10 @@ namespace ABCBankWebApi.Services
             
         }
 
-
-
+        public void ChangePhoneNumber(long longClientId,string stringPhoneNumber)
+        {
+            StoredProcedure.ExecuteStoredProcedure("Sp_ChangeClientPhoneNumber", new List<SqlParameter> { new SqlParameter("@ClientId", longClientId), new SqlParameter("@PhoneNumber", stringPhoneNumber) });
+        }
 
 
     }

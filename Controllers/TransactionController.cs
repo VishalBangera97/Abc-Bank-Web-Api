@@ -1,6 +1,7 @@
 ﻿using AbcBankDalLayer.Models;
 using ABCBankWebApi.Helpers;
 using ABCBankWebApi.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -11,6 +12,7 @@ namespace ABCBankWebApi.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService transactionService;
+
         public TransactionController(ITransactionService transactionService)
         {
             this.transactionService = transactionService;
@@ -38,7 +40,7 @@ namespace ABCBankWebApi.Controllers
             {
                 LogTraceFactory.LogInfo("Getting Account Summary for Account Number " + stringAccountNumber);
                 var accountSummary = transactionService.GetAccountSummary(stringAccountNumber, beginDate, endDate);
-                if (accountSummary == null)
+                if (!accountSummary.GetEnumerator().MoveNext())
                 {
                     LogTraceFactory.LogInfo("No Account Summary found for Account Number " + stringAccountNumber);
                     return StatusCode(404, "No account Summary found");
@@ -59,7 +61,7 @@ namespace ABCBankWebApi.Controllers
             {
                 LogTraceFactory.LogInfo("Getting all transaction by Account Number " + stringAccountNumber);
                 var transactions = transactionService.GetAllTransactionByAccountNumber(stringAccountNumber);
-                if (transactions == null)
+                if (!transactions.GetEnumerator().MoveNext())
                 {
                     LogTraceFactory.LogInfo("No transactions found by Account Number " + stringAccountNumber);
                     return StatusCode(404, "No transactions found");
@@ -94,16 +96,17 @@ namespace ABCBankWebApi.Controllers
             }
         }
 
-        [HttpGet("GetLastThreeTransactions/{longAccountNumber}")]
-        public IActionResult GetLastThreeTransactions(long longAccountNumber)
+        [HttpGet("GetLastTenTransactions/{stringAccountType}")]
+        public IActionResult GetLastTenTransactions(string stringAccountType)
         {
             try
             {
-                LogTraceFactory.LogInfo("Getting Last 3 transactions for account Number " + longAccountNumber);
-                var transactions = transactionService.GetLastThreeTransactions(longAccountNumber);
-                if (transactions == null)
+                LogTraceFactory.LogInfo("Getting Last 10 transactions of Client");
+                var longClientId = GetClientId();
+                var transactions = transactionService.GetLastTenTransactions(longClientId,stringAccountType);
+                if (!transactions.GetEnumerator().MoveNext())
                 {
-                    LogTraceFactory.LogInfo("No transactions found for Account Number " + longAccountNumber);
+                    LogTraceFactory.LogInfo("No transactions found ");
                     return StatusCode(404, "No transactions found");
                 }
                 return Ok(transactions);
@@ -113,6 +116,11 @@ namespace ABCBankWebApi.Controllers
                 return StatusCode(500, ex.Message);
             }
 
+        }
+
+        public long GetClientId()
+        {
+            return BitConverter.ToInt64(HttpContext.Session.Get("clientId"));
         }
     }
 }

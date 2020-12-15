@@ -12,8 +12,7 @@ namespace ABCBankWebApi.Extensions
         public static void ConfigureExceptionHandler(this IApplicationBuilder app)
         {
             app.UseExceptionHandler(a => a.Run(async context =>
-            {
-                
+            { 
                 context.Response.ContentType = "application/json";
                 var contextFeature = context.Features.Get<IExceptionHandlerPathFeature>();
                 if (contextFeature != null)

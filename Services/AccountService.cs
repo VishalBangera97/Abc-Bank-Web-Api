@@ -71,6 +71,13 @@ namespace ABCBankWebApi.Services
             return mapper.Map<Account>(getAccountByAccountNumberResult);
         }
 
+        public IEnumerable<Account> GetAllAccountStatusByClientId(long longClientId)
+        {
+            var getAllAccountStatusByClientId = StoredProcedure.ExecuteStoredProcedureWithResult<GetAccountsByClientIdResult>("Sp_GetAllAccountStatusByClientId", new List<SqlParameter> { new SqlParameter("@ClientId", longClientId) });
+            return mapper.Map<IEnumerable<Account>>(getAllAccountStatusByClientId);
+
+        }
+
 
 
 

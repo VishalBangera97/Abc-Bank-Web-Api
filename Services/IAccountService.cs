@@ -12,5 +12,7 @@ namespace ABCBankWebApi.Services
         IEnumerable<BankBranch> GetAllBranch();
         IEnumerable<Account> GetAccountsByClientId(long longClientId, string status);
         Account GetAppliedAccountByAccountNumber(string accountNumber);
+        IEnumerable<Account> GetAllAccountStatusByClientId(long longClientId);
+
     }
 }

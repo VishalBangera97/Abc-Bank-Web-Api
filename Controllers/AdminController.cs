@@ -73,7 +73,7 @@ namespace ABCBankWebApi.Controllers
                 var admin = adminService.GetAdminByAdminId(longAdminId);
                 if (admin == null)
                 {
-                    LogTraceFactory.LogInfo("Admin with Admin ID " + longAdminId+" Not found " );
+                    LogTraceFactory.LogInfo("Admin with Admin ID " + longAdminId + " Not found ");
                     return StatusCode(404, "Admin Not found");
                 }
                 return Ok(admin);

@@ -11,5 +11,10 @@ namespace ABCBankWebApi.Services
         void ClientLogout(long longinId);
         IEnumerable<ClientProfile> GetClientsBasedOnStatus(string stringStatus);
 
+        void ChangePhoneNumber(long longClientId, string stringPhoneNumber);
+
+
+
+
     }
 }

@@ -63,10 +63,10 @@ namespace ABCBankWebApi.Services
             return mapper.Map<Transaction>(getTransactionByTransactionIdResult.FirstOrDefault());
         }
 
-        public IEnumerable<Transaction> GetLastThreeTransactions(long longAccountNumber)
+        public IEnumerable<Transaction> GetLastTenTransactions(long longClientId, string stringAccountType)
         {
-            var getLastThreeTransactionResult = StoredProcedure.ExecuteStoredProcedureWithResult<GetAllTransactionByAccountNumberResult>("Sp_GetLastThreeTransactions", new List<SqlParameter> { new SqlParameter("@AccountNumber", longAccountNumber) });
-            return mapper.Map<IEnumerable<Transaction>>(getLastThreeTransactionResult);
+            var getLastTenTransactionResult = StoredProcedure.ExecuteStoredProcedureWithResult<GetAllTransactionByAccountNumberResult>("Sp_GetLastTenTransactions", new List<SqlParameter> { new SqlParameter("@ClientId", longClientId),new SqlParameter("@AccountType",stringAccountType) });
+            return mapper.Map<IEnumerable<Transaction>>(getLastTenTransactionResult);
         }
     }
 }

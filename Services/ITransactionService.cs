@@ -10,7 +10,7 @@ namespace ABCBankWebApi.Services
         IEnumerable<Transaction> GetAllTransactionByAccountNumber(string stringAccountNumber);
         IEnumerable<Transaction> GetAccountSummary(string accountNumber, DateTime beginDate, DateTime endDate);
         Transaction GetTransactionByTransactionId(long longTransactionId);
-        IEnumerable<Transaction> GetLastThreeTransactions(long longAccountNumber);
+        IEnumerable<Transaction> GetLastTenTransactions(long longClientId, string stringAccountType);
 
     }
 }

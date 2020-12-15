@@ -1,3 +1,4 @@
+using AbcBankDalLayer.Controllers;
 using ABCBankWebApi.Extensions;
 using ABCBankWebApi.Helpers;
 using ABCBankWebApi.Services;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace ABCBankWebApi
 {
@@ -28,7 +30,12 @@ namespace ABCBankWebApi
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<ClientController>();
             services.AddCors();
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(1);
+            });
+            services.AddDistributedMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +48,7 @@ namespace ABCBankWebApi
             app.ConfigureExceptionHandler();
             app.UseRouting();
             app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseSession();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {

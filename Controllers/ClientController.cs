@@ -1,10 +1,13 @@
 ﻿using AbcBankDalLayer.Models;
 using ABCBankWebApi.Helpers;
 using ABCBankWebApi.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
-namespace AbcBankDalLayer.Cont
+namespace AbcBankDalLayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -14,6 +17,37 @@ namespace AbcBankDalLayer.Cont
         public ClientController(IClientService clientService)
         {
             this.clientService = clientService;
+        }
+
+
+        [HttpPut("SetClientId/{token}")]
+        public IActionResult SetClientId(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            var stringClientId = jsonToken.Claims.First().Value;
+            var longClientId = Int64.Parse(stringClientId);
+            if (clientService.GetClientByClientId(longClientId) != null)
+            {
+                HttpContext.Session.Set("clientId", BitConverter.GetBytes(longClientId));
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(404);
+            }
+        }
+
+        public long getClientId()
+        {
+            var clientId = HttpContext.Session.Get("clientId");
+            return BitConverter.ToInt64(clientId);
+        }
+
+        [HttpDelete("ClearClientId")]
+        public void ClearClientId()
+        {
+            HttpContext.Session.Clear();
         }
 
         [HttpPost("AddClient")]
@@ -49,16 +83,16 @@ namespace AbcBankDalLayer.Cont
         }
 
 
-        [HttpGet("GetClient/{longClientId}")]
-        public IActionResult GetClientByClientId(long longClientId)
+        [HttpGet("GetClient")]
+        public IActionResult GetClientByClientId()
         {
             try
             {
-                LogTraceFactory.LogInfo("Getting Client details with Client ID " + longClientId);
-                var client = clientService.GetClientByClientId(longClientId);
+                LogTraceFactory.LogInfo("Getting Client details with Client ID " + getClientId());
+                var client = clientService.GetClientByClientId(getClientId());
                 if (client == null)
                 {
-                    LogTraceFactory.LogInfo("No client found with Client  ID " + longClientId);
+                    LogTraceFactory.LogInfo("No client found with Client  ID " + getClientId());
                     return StatusCode(404, "Client Not Found");
                 }
                 return Ok(client);
@@ -93,7 +127,7 @@ namespace AbcBankDalLayer.Cont
             {
                 LogTraceFactory.LogInfo("Getting " + stringStatus + " clients");
                 var clients = clientService.GetClientsBasedOnStatus(stringStatus);
-                if (clients == null)
+                if (!clients.GetEnumerator().MoveNext())
                 {
                     LogTraceFactory.LogInfo("No " + stringStatus + " clients found");
                     return StatusCode(404, "No clients found");
@@ -107,5 +141,22 @@ namespace AbcBankDalLayer.Cont
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPut("ChangePhoneNumber/{longclientId}/{stringPhoneNumber}")]
+        public IActionResult ChangePhoneNumber(long longClientId, string stringPhoneNumber)
+        {
+            try
+            {
+                LogTraceFactory.LogInfo("Changing Client Phone number with client id " + longClientId);
+                clientService.ChangePhoneNumber(longClientId, stringPhoneNumber);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                LogTraceFactory.LogError(403, ex.Message);
+                return StatusCode(403, ex.Message);
+            }
+        }
+
     }
 }
